@@ -38,28 +38,37 @@ function init() {
   });
   fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
-  wavesurfer.on('ready', showSuggestedLoops);
   regionsPlugin.on('region-click', (region, e) => {
     e.stopPropagation();
     region.playLoop();
   });
 }
 
-function handleFiles(files) {
+async function handleFiles(files) {
   if (!files.length) return;
   const file = files[0];
   if (!file.type.startsWith('audio')) return;
   currentFile = file;
   wavesurfer.loadBlob(file);
+
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    const res = await fetch('/api/extract', {
+      method: 'POST',
+      body: formData
+    });
+    if (res.ok) {
+      const data = await res.json();
+      wavesurfer.once('ready', () => showSuggestedLoops(data.loops));
+    }
+  } catch (e) {
+    console.error(e);
+  }
 }
 
-function showSuggestedLoops() {
+function showSuggestedLoops(loops) {
   regionsPlugin.clearRegions();
-  const duration = wavesurfer.getDuration();
-  const loops = [
-    { start: 0, end: Math.min(2, duration) },
-    { start: Math.max(0, duration / 2 - 1), end: Math.min(duration, duration / 2 + 1) }
-  ];
   loops.forEach(({ start, end }) =>
     regionsPlugin.addRegion({
       start,
@@ -73,13 +82,13 @@ function showSuggestedLoops() {
 
 async function exportSelection() {
   if (!currentFile) return;
-  const loops = Object.values(regionsPlugin.regions).map((r) => ({
-    start: r.start,
-    end: r.end
-  }));
+  const regions = Object.values(regionsPlugin.regions);
+  if (!regions.length) return;
+  const { start, end } = regions[0];
   const formData = new FormData();
   formData.append('file', currentFile);
-  formData.append('loops', JSON.stringify(loops));
+  formData.append('start', start);
+  formData.append('end', end);
 
   const res = await fetch('/api/export', {
     method: 'POST',
