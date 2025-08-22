@@ -1,2 +1,9 @@
 # SplicePoint
-A web-based tool that turns any track into perfectly trimmed, bar-tight loops you can audition, adjust, and download in seconds.
+This app is a browser-based sample extractor built for producers, DJs, and audio tinkerers who want fast, reliable loops without digging through waveforms manually.
+	•	Upload any track – MP3, WAV, AIFF, you name it.
+	•	Automatic analysis – Detects BPM, beat grid, and suggests the cleanest loop points with confidence scores.
+	•	Interactive waveform preview – Drag start/end markers or snap to the beat grid for bar-perfect precision.
+	•	Loop auditioning – Instantly play and loop your selection right in the browser.
+	•	One-click export – Download your loop as a trimmed WAV file, ready to drop into your DAW, sampler, or set.
+
+Whether you’re chopping samples for hip-hop, prepping loops for a live set, or slicing stems for remixing, this tool makes the process quick, visual, and musical.
