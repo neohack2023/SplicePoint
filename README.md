@@ -7,3 +7,9 @@ This app is a browser-based sample extractor built for producers, DJs, and audio
 	•	One-click export – Download your loop as a trimmed WAV file, ready to drop into your DAW, sampler, or set.
 
 Whether you’re chopping samples for hip-hop, prepping loops for a live set, or slicing stems for remixing, this tool makes the process quick, visual, and musical.
+
+## Frontend
+
+A static frontend lives in [`frontend/`](frontend/) using [WaveSurfer.js](https://wavesurfer-js.org/) with Regions and Timeline plugins. It supports drag-and-drop audio upload, loop suggestions, region auditioning, and exporting loops by posting to `/api/export`.
+
+Open `frontend/index.html` in a browser to try it out.

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SplicePoint</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+  <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
+  <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/timeline.min.js"></script>
+</head>
+<body>
+  <div id="drop" class="drop">
+    Drop audio here or click to upload
+    <input type="file" id="fileInput" accept="audio/*" hidden />
+  </div>
+  <div id="waveform"></div>
+  <div id="timeline"></div>
+  <div class="controls">
+    <button id="play">Play</button>
+    <button id="pause">Pause</button>
+    <button id="stop">Stop</button>
+    <button id="export">Export</button>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
