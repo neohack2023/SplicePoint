@@ -106,6 +106,7 @@ Important files:
 | [Documentation Index](docs/README.md) | Main map of project docs |
 | [Mission](docs/MISSION.md) | Project purpose, target users, goals, and non-goals |
 | [Architecture](docs/ARCHITECTURE.md) | System design, data flow, boundaries, and extension points |
+| [API Reference](docs/API.md) | Backend endpoint contract and response shapes |
 | [Setup](docs/SETUP.md) | Installation and local development instructions |
 | [Usage](docs/USAGE.md) | How to use SplicePoint after setup |
 | [Configuration](docs/CONFIGURATION.md) | Runtime options, defaults, and safe values |
