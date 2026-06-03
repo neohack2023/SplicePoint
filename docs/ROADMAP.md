@@ -1,198 +1,211 @@
 # SplicePoint Roadmap
 
-## Current State Review
+## Current Status
 
-SplicePoint is currently an early-stage browser-based sample extraction tool.
+SplicePoint is an active prototype.
 
-The `main` branch contains a static WaveSurfer.js frontend with:
+The Phase 1 frontend/backend workflow has been merged into `main`:
 
-- Drag-and-drop or click-to-upload audio input
-- Waveform rendering
-- Timeline display
-- Play, pause, stop, and export controls
-- Basic loop-region overlays
-- A frontend export request pointed at `/api/export`
+```text
+upload audio
+→ backend extracts Phase 1 candidates
+→ frontend displays editable regions
+→ user selects or adjusts a loop
+→ backend exports selected WAV slice
+```
 
-The current frontend proves the interface direction, but the analysis layer is still placeholder-level. Loop suggestions are based on simple duration math rather than real musical analysis.
-
-An open backend pull request exists that adds a Spring Boot service with:
-
-- `POST /api/extract`
-- `POST /api/export`
-- Placeholder BPM output
-- Duration extraction
-- Simple loop suggestions
-- WAV trimming between `start` and `end` seconds
-
-That backend PR moves the project closer to a complete prototype, but the core SplicePoint identity still depends on replacing placeholder analysis with actual loop intelligence.
+The current system is useful for early testing, but it is not yet a full musical-analysis engine.
 
 ## Product Goal
 
 SplicePoint should become a fast browser-based loop extraction tool for producers, DJs, remixers, and audio tinkerers.
 
-The core promise:
+Core promise:
 
-> Upload a track, detect useful musical splice points, preview clean loop regions, and export usable WAV loops with minimal friction.
+> Upload a track, detect useful musical splice points, preview clean loop regions, adjust them if needed, and export usable WAV loops with minimal friction.
 
-The goal is not to become a full DAW. The goal is to become a sharp, focused sample-slicing utility that gets creators from audio file to usable loop quickly.
+SplicePoint should stay focused. It is not trying to become a full DAW.
 
 ## Guiding Principles
 
-- Keep the workflow simple: upload, analyze, preview, export.
+- Keep the workflow simple: upload, analyze, preview, adjust, export.
 - Prefer musical usefulness over feature bloat.
 - Make suggested loops explainable with confidence indicators.
 - Keep manual override available so the user stays in control.
-- Build the analysis system in stages instead of pretending placeholder math is finished intelligence.
+- Treat user edits as learning signal, not failure.
 - Keep frontend and backend contracts clear.
-- Avoid heavy dependencies until the core loop workflow is proven.
+- Avoid heavy dependencies until the core loop workflow is stable.
+
+---
+
+# Active Work
 
 ## Phase 1: Stabilize Prototype
 
-### Goals
+### Status
 
-- Merge or finish the backend PR once it builds cleanly.
-- Ensure the frontend and backend agree on request and response formats.
-- Make the export button work reliably against the backend.
-- Document local run steps clearly.
+Active.
 
-### Tasks
+The basic backend/frontend pipeline exists. The next work is hardening and cleanup.
 
-- Merge backend scaffold after verification.
-- Confirm `/api/extract` accepts uploaded audio and returns JSON.
-- Confirm `/api/export` accepts `file`, `start`, and `end` fields.
-- Update README with separate frontend and backend startup instructions.
-- Add basic error messages in the frontend when upload, analysis, or export fails.
-- Replace generic backend package naming later, such as `com.example.backend`, with a SplicePoint-specific package.
+### Completed
+
+- Spring Boot backend scaffold.
+- `GET /api/health`.
+- `POST /api/extract`.
+- `POST /api/export`.
+- Frontend upload and waveform flow.
+- Editable loop regions.
+- Candidate cards.
+- Selected-region WAV export.
+- Basic backend regression tests with synthetic WAV.
+- Initial project documentation structure.
+
+### Remaining
+
+- Fix any WaveSurfer v7 compatibility issues from CDN plugin usage.
+- Rename Java package from `com.example.backend` to a SplicePoint-specific package.
+- Split large `AudioServices.java` into smaller analysis/export modules.
+- Add controller/API tests for invalid inputs.
+- Add CI workflow for backend tests.
+- Decide whether to add a root `LICENSE` file.
 
 ### Definition of Done
 
 - User can run backend locally.
 - User can open frontend locally.
-- User can upload a WAV-compatible audio file.
-- User can see suggested regions.
-- User can export at least one WAV loop.
+- User can upload a short WAV-compatible audio file.
+- User can see candidate regions.
+- User can adjust a selected region.
+- User can export a WAV loop.
+- Basic tests pass.
+- Setup, usage, testing, and troubleshooting docs are current.
+
+---
+
+# Planned Work
 
 ## Phase 2: Real Loop Detection
 
-### Goals
+### Goal
 
-Replace placeholder loop suggestions with actual musical analysis.
+Replace Phase 1 heuristic loop suggestions with stronger musical analysis.
 
-### First Analysis Targets
+### Planned Features
 
-- Duration
-- Sample rate
-- Channel count
-- Basic peak/transient detection
-- Rough tempo estimate
-- Candidate loop windows
-- Zero-crossing cleanup near loop boundaries
-
-### Candidate Loop Logic
-
-Initial loop suggestions should prefer:
-
-- Strong transient starts
-- Bar-like durations
-- Stable energy sections
-- Clean loop endpoints
-- Low click/pop risk
-- Repeated rhythmic structure
-
-### Confidence Score Inputs
-
-A loop confidence score can be built from:
-
-- Boundary cleanliness
-- Transient strength near start point
-- Energy consistency across the region
-- Estimated bar alignment
-- Repetition similarity
-- Click/pop risk
+- onset/transient detection
+- RMS and energy-window features
+- zero-crossing or low-amplitude boundary cleanup
+- seam-risk scoring
+- score components per candidate
+- stable `analysisRunId`
+- stable `candidateId`
 
 ### Definition of Done
 
-- `/api/extract` returns loop candidates based on audio features, not hardcoded duration slices.
-- Each loop candidate includes start, end, duration, and confidence.
-- Frontend displays multiple candidates clearly.
+- `/api/extract` returns candidate IDs and score components.
+- Candidate confidence comes from documented feature scores.
+- Frontend can display top reasons without clutter.
+- Export behavior remains stable.
 
-## Phase 3: Interactive Editing
+## Phase 3: Tempo and Beat Grid
 
-### Goals
+### Goal
 
-Make the frontend feel like a real loop workstation instead of a static preview.
+Make loop candidates musically timed, not just clean-looking.
 
-### Tasks
+### Planned Features
 
-- Allow regions to be dragged and resized.
-- Add selected-region state.
-- Export the currently selected region instead of always using the first region.
-- Add visible start/end/duration readout.
-- Add snap-to-beat or snap-to-grid once beat grid exists.
-- Add keyboard shortcuts for play, stop, loop, and export.
-
-### Definition of Done
-
-- User can accept a suggested loop or manually adjust it.
-- Export uses the adjusted user selection.
-- The UI clearly shows what will be exported.
-
-## Phase 4: Beat Grid and BPM Intelligence
-
-### Goals
-
-Build the musical timing layer that makes SplicePoint useful for producers.
-
-### Tasks
-
-- Add BPM estimation.
-- Add beat-grid generation.
-- Add bar-length options such as 1, 2, 4, 8, and 16 bars.
-- Add confidence for BPM detection.
-- Allow manual BPM override.
-- Allow manual grid offset correction.
+- global BPM estimate
+- BPM confidence
+- beat timestamps
+- beat-aligned loop candidates
+- candidate `startBeatIndex`, `endBeatIndex`, and `loopBeats`
+- manual BPM/grid correction later
 
 ### Definition of Done
 
-- SplicePoint can suggest musically timed loops.
-- User can correct BPM/grid if the analysis guesses wrong.
-- Loop candidates can be ranked by musical fit.
+- Synthetic click-track tests can verify BPM behavior.
+- Low-confidence BPM falls back safely.
+- Candidate ranking improves when beat alignment and boundary cleanliness agree.
 
-## Phase 5: Export Improvements
+## Phase 4: Feedback Learning
 
-### Goals
+### Goal
 
-Make exported loops more useful in real music workflows.
+Allow SplicePoint to learn from user choices over time.
 
-### Tasks
+### Planned Features
 
-- Add export filename based on source track and time range.
-- Add optional short fade in/out to reduce clicks.
-- Add normalize option.
-- Add mono/stereo preservation checks.
-- Add export metadata where useful.
-- Support exporting multiple selected loops.
+- `POST /api/feedback`
+- JSONL feedback event storage for local prototype work
+- preview/export/rating event hooks
+- good/bad explicit ratings
+- edit-distance tracking
+- training dataset builder
 
 ### Definition of Done
 
-- Exported files are named clearly.
-- Exported loops avoid obvious clicks at boundaries.
-- Users can export one or multiple usable loops.
+- Feedback events are logged without raw audio by default.
+- Candidate features and user outcomes can be joined for ranking experiments.
+- Feedback failures do not break playback or export.
 
-## Phase 6: UX Polish
+## Phase 5: Musical Structure and SLM Layer
 
-### Goals
+### Goal
+
+Use structural analysis and SLM-style modeling to improve candidate prediction.
+
+### Planned Features
+
+- self-similarity or matrix-profile experiments
+- repetition score
+- homogeneity score
+- novelty boundary score
+- statistical SLM short-term model for local expectation scoring
+- optional small neural ranker after feedback data exists
+
+### Definition of Done
+
+- Structure scores are exposed as candidate score components.
+- Statistical expectation scoring improves candidate ranking in repeated-pattern tests.
+- Heuristic fallback remains available.
+
+## Phase 6: Export Improvements
+
+### Goal
+
+Make exported loops more useful in real production workflows.
+
+### Planned Features
+
+- better filename generation
+- configurable fade in/out
+- optional normalization
+- mono/stereo preservation checks
+- multi-loop export
+- future export metadata
+
+### Definition of Done
+
+- Exported loops are named clearly.
+- Exported loops avoid obvious clicks at boundaries when possible.
+- Users can export one or more usable loops.
+
+## Phase 7: UX Polish
+
+### Goal
 
 Make the app feel intentional, fast, and creator-friendly.
 
-### Tasks
+### Planned Features
 
-- Add loading states for waveform and analysis.
-- Add failed-file handling.
-- Add unsupported-format messaging.
-- Add candidate loop cards with confidence scores.
-- Add lightweight visual styling beyond the current minimal CSS.
-- Add mobile/tablet layout only if desktop flow is stable first.
+- clearer loading states
+- unsupported-format messages
+- better candidate score display
+- beat-grid visualization when available
+- responsive layout polish
+- keyboard shortcuts
 
 ### Definition of Done
 
@@ -200,56 +213,52 @@ Make the app feel intentional, fast, and creator-friendly.
 - Errors are visible and useful.
 - The interface feels like a focused audio tool, not a test page.
 
-## Phase 7: Testing and Project Hygiene
+---
 
-### Goals
+# Parked Ideas
 
-Prevent future changes from breaking the core upload/analyze/export loop.
+These may be useful later, but should not distract from the core loop pipeline now.
 
-### Tasks
+- Browser-only analysis engine.
+- Python research backend.
+- FFmpeg-based decoding/export service.
+- ONNX browser ranker.
+- User accounts or cloud loop libraries.
+- Audio library search.
+- Stem separation.
+- MIDI companion-loop generation.
+- DAW plugin integration.
 
-- Add backend unit tests for extraction and export.
-- Add small test WAV fixtures.
-- Add frontend lint or syntax checks.
-- Add GitHub Actions CI for backend tests.
-- Add a minimal contribution/dev guide.
-- Add API contract documentation under `docs/`.
+---
 
-### Definition of Done
+# Rejected For Now
 
-- CI can verify backend builds.
-- Export behavior has regression coverage.
-- API request/response shape is documented.
+These are intentionally out of scope at the current stage.
 
-## Suggested Docs Structure
+- Full DAW editing timeline.
+- Cloud storage of uploaded raw audio by default.
+- Large neural model as the first analysis engine.
+- Automatic copyright/authenticity claims.
+- Hidden feedback logging without explicit documentation.
 
-Future docs can live here:
+---
 
-```text
-/docs
-  ROADMAP.md
-  API.md
-  ANALYSIS_NOTES.md
-  LOCAL_DEVELOPMENT.md
-  LOOP_DETECTION_RESEARCH.md
-```
+# Near-Term Priority Stack
 
-## Near-Term Priority Stack
+1. Verify frontend plugin compatibility and selected-region export in-browser.
+2. Add stable `analysisRunId` and `candidateId`.
+3. Add score component object to candidates.
+4. Add controller tests and invalid-input tests.
+5. Refactor backend analysis services into smaller modules.
+6. Add feedback event schema and logging.
+7. Add BPM/onset synthetic test fixtures.
+8. Add CI for backend tests.
+9. Continue Phase 2 musical-analysis work.
 
-1. Finish backend PR and make export work end-to-end.
-2. Update README with real run instructions.
-3. Make frontend regions editable and export selected region.
-4. Replace placeholder BPM and loop suggestions with first-pass analysis.
-5. Add confidence scores.
-6. Add beat-grid and manual correction.
-7. Add tests and CI.
+## Working Note
 
-## Working Notes
-
-The current version has a strong concept and a clean starting shape. The most important thing is to avoid feature sprawl before the core loop pipeline works.
-
-The first real milestone should be:
+The first real milestone remains:
 
 > Upload audio → get believable loop candidates → audition one → adjust it → export a clean WAV.
 
-Once that loop works, everything else becomes an upgrade instead of scaffolding wearing a trench coat.
+Everything else should make that loop smarter, safer, or easier to trust.
