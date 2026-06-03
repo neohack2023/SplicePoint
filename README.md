@@ -1,91 +1,47 @@
 # SplicePoint
 
-SplicePoint is a browser-based sample extractor for producers, DJs, remixers, and audio tinkerers who want fast, reliable loops without digging through waveforms manually.
+SplicePoint is an experimental browser-based loop extraction tool that helps creators find, preview, adjust, and export useful musical splice points from audio files.
 
-## Current Phase 1 Goal
+## Mission
 
-Upload audio, inspect candidate splice regions, audition loops, adjust the selected region, and export a usable WAV slice.
+SplicePoint exists to make sample chopping faster, more visual, and more musically aware without turning the workflow into a full DAW.
 
-SplicePoint is not trying to become a full DAW. It is a focused loop utility: quick in, clean loop out.
+The project goal is simple: upload audio, see likely loop candidates, audition them, adjust the region if needed, and export a clean WAV loop.
 
-## Features
+## What It Does
 
-- Upload browser-supported audio through the frontend.
-- Render an interactive waveform with WaveSurfer.js.
-- Display candidate loop regions returned by the backend.
-- Drag and resize regions in the waveform.
-- Audition a loop by clicking a region or candidate card.
-- Export the selected region as a WAV file.
-- Return Phase 1 analysis metadata: duration, sample rate, channel count, heuristic candidates, confidence scores, and warnings.
+SplicePoint currently provides:
 
-## Frontend
+- a static WaveSurfer.js frontend for waveform viewing and region editing
+- drag-and-drop audio upload
+- backend-assisted audio analysis through Spring Boot
+- loop candidate suggestions with confidence-style metadata
+- selected-region auditioning and WAV export
+- early backend regression tests for analysis and export behavior
 
-The static frontend lives in [`frontend/`](frontend/) and uses WaveSurfer.js with Regions and Timeline plugins.
+## Why It Was Made
 
-When opened directly from disk, the frontend points API calls to `http://localhost:8080`. When served from another origin, it uses same-origin API paths.
+Manual loop hunting can be slow: creators scrub waveforms, guess boundaries, trim by ear, export, and repeat. SplicePoint is being built to reduce that friction by combining waveform interaction, musical-analysis heuristics, and future feedback-driven ranking.
 
-Open this file in a browser for local Phase 1 testing:
+It is designed for producers, DJs, remixers, sample pack builders, and audio tinkerers who want a focused loop utility instead of another heavyweight editing environment.
 
-```text
-frontend/index.html
-```
+## Current Status
 
-## Backend
+**Prototype / active development.**
 
-The backend lives in [`backend/`](backend/). It is a Spring Boot application that exposes the Phase 1 audio API.
+The Phase 1 backend and frontend workflow are in place, but the analysis engine is still early. Current candidate detection uses heuristic audio features. Full BPM detection, beat-grid alignment, self-similarity analysis, feedback learning, and SLM-assisted ranking are planned but not complete.
 
-### Endpoints
+## Quick Start
 
-#### `GET /api/health`
+### Requirements
 
-Returns backend status and engine identity.
+- Java 21
+- A browser with modern JavaScript support
+- Network access on first backend build so Maven can download dependencies
 
-#### `POST /api/extract`
+### Run the backend
 
-Accepts multipart form data:
-
-```text
-file=<audio file>
-```
-
-Returns JSON with:
-
-- file name
-- content type
-- byte size
-- duration seconds
-- sample rate
-- channel count
-- BPM estimate placeholder fields
-- engine status
-- loop candidates
-- warning messages
-
-Loop candidates include:
-
-- `start`
-- `end`
-- `duration`
-- `confidence`
-- `label`
-- `reasons`
-
-#### `POST /api/export`
-
-Accepts multipart form data:
-
-```text
-file=<audio file>
-start=<seconds>
-end=<seconds>
-fadeMs=<optional fade length, default 5>
-```
-
-Returns a downloadable `audio/wav` response.
-
-## Run Backend
-
-From the repo root:
+From the repository root:
 
 ```bash
 ./backend/mvnw spring-boot:run
@@ -97,33 +53,76 @@ On Windows PowerShell:
 .\backend\mvnw.cmd spring-boot:run
 ```
 
-The backend defaults to:
+The backend runs at:
 
 ```text
 http://localhost:8080
 ```
 
-## Test Backend
+### Open the frontend
+
+Open this file in a browser:
+
+```text
+frontend/index.html
+```
+
+When opened from disk, the frontend sends API calls to `http://localhost:8080`.
+
+### Run tests
 
 ```bash
 ./backend/mvnw test
 ```
 
-The first run needs network access so Maven can resolve Spring Boot dependencies.
-
-## Phase 1 Format Note
-
-The backend currently uses Java Sound for decoding and WAV export. WAV and AIFF are the safest local test formats. Broader MP3 or codec-heavy support should be treated as a later backend-engine upgrade, likely through FFmpeg or another dedicated audio stack.
-
-## Development Direction
-
-The current implementation keeps the frontend and backend contract simple:
+## Project Structure
 
 ```text
-upload file
-→ /api/extract returns loop candidates
-→ user selects or edits region
-→ /api/export returns selected WAV slice
+SplicePoint/
+├── README.md
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── backend/                 # Spring Boot backend API and audio services
+├── frontend/                # Static WaveSurfer.js browser interface
+└── docs/                    # Project documentation and planning notes
 ```
 
-Future roadmap work should improve the analysis engine without changing that basic workflow unless absolutely necessary.
+Important files:
+
+| Path | Purpose |
+|---|---|
+| `frontend/index.html` | Browser UI shell |
+| `frontend/app.js` | Upload, analysis, region selection, and export workflow |
+| `frontend/styles.css` | Frontend layout and styling |
+| `backend/pom.xml` | Spring Boot/Maven project definition |
+| `backend/src/main/java/com/example/backend/AudioController.java` | REST API endpoints |
+| `backend/src/main/java/com/example/backend/AudioServices.java` | Phase 1 audio analysis/export services |
+| `backend/src/test/java/com/example/backend/BackendApplicationTests.java` | Backend regression tests |
+
+## Documentation
+
+| Document | Purpose |
+|---|---|
+| [Documentation Index](docs/README.md) | Main map of project docs |
+| [Mission](docs/MISSION.md) | Project purpose, target users, goals, and non-goals |
+| [Architecture](docs/ARCHITECTURE.md) | System design, data flow, boundaries, and extension points |
+| [Setup](docs/SETUP.md) | Installation and local development instructions |
+| [Usage](docs/USAGE.md) | How to use SplicePoint after setup |
+| [Configuration](docs/CONFIGURATION.md) | Runtime options, defaults, and safe values |
+| [Security](docs/SECURITY.md) | Input risks, trust boundaries, and safety rules |
+| [Testing](docs/TESTING.md) | Test commands, manual QA, and regression expectations |
+| [Roadmap](docs/ROADMAP.md) | Active, planned, parked, and rejected work |
+| [Troubleshooting](docs/TROUBLESHOOTING.md) | Common symptoms, causes, and fixes |
+| [Musical Analysis Roadmap](docs/MUSICAL_ANALYSIS_ROADMAP.md) | DSP, MIR, ranking, and feedback-learning plan |
+| [SLM Feedback Architecture](docs/SLM_FEEDBACK_ARCHITECTURE.md) | Statistical/Small Language Model direction for loop prediction |
+| [Decision Records](docs/DECISIONS/) | Major design choices and tradeoffs |
+| [Contributing](CONTRIBUTING.md) | Contribution rules and workflow expectations |
+| [Changelog](CHANGELOG.md) | Human-readable project history |
+
+## Guiding Principle
+
+Every loop suggestion must be explainable, editable, and safely exportable.
+
+## License
+
+No license has been selected yet. Until a license is added, assume all rights are reserved by the repository owner.
