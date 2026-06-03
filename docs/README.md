@@ -18,6 +18,7 @@ The root [`README.md`](../README.md) is the landing page. These docs are the wor
 | Document | Purpose |
 |---|---|
 | [Architecture](ARCHITECTURE.md) | System design, data flow, runtime behavior, boundaries, and extension points |
+| [API Reference](API.md) | Backend endpoint contract and response shapes |
 | [Configuration](CONFIGURATION.md) | Runtime settings, defaults, and safe values |
 | [Testing](TESTING.md) | Automated tests, manual QA, and regression expectations |
 | [Security](SECURITY.md) | Trust boundaries, unsafe inputs, file handling, and safety rules |
@@ -40,7 +41,7 @@ Keep the root README short. Put implementation detail here.
 When adding a feature, update the smallest relevant doc:
 
 - setup change → `SETUP.md`
-- API or component change → `ARCHITECTURE.md`
+- API or component change → `API.md` and/or `ARCHITECTURE.md`
 - runtime option → `CONFIGURATION.md`
 - user-facing behavior → `USAGE.md`
 - risk or boundary → `SECURITY.md`
