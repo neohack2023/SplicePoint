@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SplicePoint</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
@@ -9,18 +10,47 @@
   <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/timeline.min.js"></script>
 </head>
 <body>
-  <div id="drop" class="drop">
-    Drop audio here or click to upload
-    <input type="file" id="fileInput" accept="audio/*" hidden />
-  </div>
-  <div id="waveform"></div>
-  <div id="timeline"></div>
-  <div class="controls">
-    <button id="play">Play</button>
-    <button id="pause">Pause</button>
-    <button id="stop">Stop</button>
-    <button id="export">Export</button>
-  </div>
+  <main class="app-shell">
+    <header class="hero">
+      <p class="eyebrow">Phase 1 Prototype</p>
+      <h1>SplicePoint</h1>
+      <p>Upload audio, inspect candidate splice regions, audition loops, and export the selected WAV slice.</p>
+    </header>
+
+    <section class="panel upload-panel">
+      <div id="drop" class="drop">
+        Drop audio here or click to upload
+        <input type="file" id="fileInput" accept="audio/*" hidden />
+      </div>
+      <p id="status" class="status">Initializing...</p>
+    </section>
+
+    <section class="panel waveform-panel">
+      <div id="waveform"></div>
+      <div id="timeline"></div>
+      <div class="controls">
+        <button id="play" type="button">Play</button>
+        <button id="pause" type="button">Pause</button>
+        <button id="stop" type="button">Stop</button>
+        <button id="export" type="button">Export Selected WAV</button>
+      </div>
+      <p id="selection" class="selection">Selected: none</p>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>Analysis</h2>
+        <p id="analysis">No analysis yet.</p>
+        <ul id="warnings" class="warnings"></ul>
+      </article>
+
+      <article class="panel">
+        <h2>Loop Candidates</h2>
+        <ol id="candidates" class="candidates"></ol>
+      </article>
+    </section>
+  </main>
+
   <script src="app.js"></script>
 </body>
 </html>
